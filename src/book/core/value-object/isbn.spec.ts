@@ -1,6 +1,6 @@
 import { ISBN } from './isbn';
-import { LengthError } from 'src/shared/errors/domain/length.error';
-import { DomainError } from 'src/shared/errors/domain/domain.error';
+import { DomainError } from 'src/shared/core/errors/domain.error';
+import { LengthError } from 'src/shared/core/errors/length.error';
 
 describe('ISBN Value Object', () => {
   it('should remove any hyphens or spaces from the ISBN input', () => {
