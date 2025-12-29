@@ -3,6 +3,7 @@ import { PersonName } from '../value-object/person-name';
 import { Email } from '../value-object/email';
 import { MemberType } from '../types/member.type';
 import { MaxActiveLoansError } from 'src/shared/core/errors/member/max-active-loans.error';
+import { MemberTypePolicy } from '../constants/member-type-policy';
 
 interface MemberConstructorProps {
   name: PersonName;
@@ -31,14 +32,9 @@ export class Member extends Entity<MemberConstructorProps> {
   }
 
   private validateActiveLoans(activeLoans: number): void {
-    if (this.type === MemberType.STUDENT && activeLoans > 3) {
-      throw new MaxActiveLoansError(this.type, 3);
-    }
-    if (this.type === MemberType.PROFESSOR && activeLoans > 10) {
-      throw new MaxActiveLoansError(this.type, 10);
-    }
-    if (this.type === MemberType.GENERAL_PUBLIC && activeLoans > 1) {
-      throw new MaxActiveLoansError(this.type, 1);
+    const { maxLoans } = MemberTypePolicy[this.type];
+    if (activeLoans > maxLoans) {
+      throw new MaxActiveLoansError(this.type, maxLoans);
     }
   }
 }
