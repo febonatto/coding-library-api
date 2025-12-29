@@ -42,4 +42,16 @@ describe('Member Entity', () => {
       }),
     ).toThrow(MaxActiveLoansError);
   });
+  it('should store only loans with status ACTIVE', () => {
+    const activeLoan = LoanFactory.make();
+    const closedLoan = LoanFactory.make();
+    closedLoan.registerReturn();
+
+    const member = MemberFactory.make({
+      activeLoans: [activeLoan, closedLoan],
+    });
+
+    expect(member.activeLoans).toHaveLength(1);
+    expect(member.activeLoans[0].id).toBe(activeLoan.id);
+  });
 });
