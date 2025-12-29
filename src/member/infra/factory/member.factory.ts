@@ -10,7 +10,7 @@ export class MemberFactory {
       name: new PersonName(faker.person.fullName()),
       email: new Email(faker.internet.email()),
       type: MemberType.GENERAL_PUBLIC,
-      activeLoans: 0,
+      activeLoans: [],
       ...overrides,
     });
   }

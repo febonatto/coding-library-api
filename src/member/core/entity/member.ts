@@ -4,12 +4,13 @@ import { Email } from '../value-object/email';
 import { MemberType } from '../types/member.type';
 import { MaxActiveLoansError } from 'src/shared/core/errors/member/max-active-loans.error';
 import { MemberTypePolicy } from '../constants/member-type-policy';
+import { Loan } from 'src/loan/core/entity/loan';
 
 interface MemberConstructorProps {
   name: PersonName;
   email: Email;
   type: MemberType;
-  activeLoans: number;
+  activeLoans: Loan[];
 }
 
 export class Member extends Entity<MemberConstructorProps> {
@@ -19,7 +20,7 @@ export class Member extends Entity<MemberConstructorProps> {
     this.activeLoans = props.activeLoans;
   }
 
-  private set activeLoans(activeLoans: number) {
+  private set activeLoans(activeLoans: Loan[]) {
     this.validateActiveLoans(activeLoans);
     this.props.activeLoans = activeLoans;
   }
@@ -27,13 +28,13 @@ export class Member extends Entity<MemberConstructorProps> {
   get type(): MemberType {
     return this.props.type;
   }
-  get activeLoans(): number {
+  get activeLoans(): Loan[] {
     return this.props.activeLoans;
   }
 
-  private validateActiveLoans(activeLoans: number): void {
+  private validateActiveLoans(activeLoans: Loan[]): void {
     const { maxLoans } = MemberTypePolicy[this.type];
-    if (activeLoans > maxLoans) {
+    if (activeLoans.length > maxLoans) {
       throw new MaxActiveLoansError(this.type, maxLoans);
     }
   }
