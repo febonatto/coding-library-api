@@ -7,6 +7,7 @@ import { MemberFactory } from 'src/member/infra/factory/member.factory';
 import { CannotRenewLoanError } from 'src/shared/core/errors/loan/cannot-renew-loan.error';
 import { LoanIsOverdueError } from 'src/shared/core/errors/loan/loan-is-overdue.error';
 import { LoanRenewalLimitReachedError } from 'src/shared/core/errors/loan/loan-renewal-limit-reached.error';
+import { LoanStatus } from '../types/loan-status';
 
 describe('Loan Entity', () => {
   beforeEach(() => {
@@ -104,11 +105,12 @@ describe('Loan Entity', () => {
 
     expect(() => loan.renew()).toThrow(LoanRenewalLimitReachedError);
   });
-  it('should mark copy as borrowed when create a loan', () => {
+  it('should, upon creation, mark loan status as ACTIVE and inventory copy as BORROWED', () => {
     const loan = LoanFactory.make();
+    expect(loan.status).toBe(LoanStatus.ACTIVE);
     expect(loan.inventory.status).toBe(CopyStatus.BORROWED);
   });
-  it('should mark return date to loan and change inventory status', () => {
+  it('should mark return date, set loan status to CLOSED and update inventory status', () => {
     const startLoanDate = new Date(2024, 0, 1);
     jest.setSystemTime(startLoanDate);
 
@@ -120,6 +122,22 @@ describe('Loan Entity', () => {
     loan.registerReturn();
 
     expect(loan.returnDate).toStrictEqual(returnLoanDate);
+    expect(loan.status).toBe(LoanStatus.CLOSED);
     expect(loan.inventory.status).not.toBe(CopyStatus.BORROWED);
+  });
+  it('should mark loan status to OVERDUE when current date is after due date', () => {
+    const fakeTime = new Date(2024, 0, 1);
+    jest.setSystemTime(fakeTime);
+
+    const { loanDays } = MemberTypePolicy[MemberType.STUDENT];
+    const loan = LoanFactory.make({
+      member: MemberFactory.make({ type: MemberType.STUDENT }),
+    });
+
+    const afterDueDateTime = addDays(fakeTime, loanDays + 1);
+    jest.setSystemTime(afterDueDateTime);
+
+    loan.registerReturn();
+    expect(loan.status).toBe(LoanStatus.OVERDUE);
   });
 });

@@ -7,6 +7,7 @@ import { Entity } from 'src/shared/core/abstract/entity';
 import { CannotRenewLoanError } from 'src/shared/core/errors/loan/cannot-renew-loan.error';
 import { LoanIsOverdueError } from 'src/shared/core/errors/loan/loan-is-overdue.error';
 import { LoanRenewalLimitReachedError } from 'src/shared/core/errors/loan/loan-renewal-limit-reached.error';
+import { LoanStatus } from '../types/loan-status';
 
 interface LoanConstructorProps {
   member: Member;
@@ -17,6 +18,7 @@ interface LoanProps extends LoanConstructorProps {
   dueDate: Date;
   returnDate: Date | null;
   renewalCount: number;
+  status: LoanStatus;
 }
 
 export class Loan extends Entity<LoanProps> {
@@ -26,9 +28,11 @@ export class Loan extends Entity<LoanProps> {
       dueDate: new Date(),
       returnDate: null,
       renewalCount: 0,
+      status: LoanStatus.ACTIVE,
     });
 
-    this.initializeLoan();
+    this.props.dueDate = this.dueDateByMemberType();
+    this.props.inventory.checkout();
   }
 
   get member(): Member {
@@ -45,6 +49,9 @@ export class Loan extends Entity<LoanProps> {
   }
   get renewalCount(): number {
     return this.props.renewalCount;
+  }
+  get status(): LoanStatus {
+    return this.props.status;
   }
 
   public renew(): void {
@@ -65,13 +72,16 @@ export class Loan extends Entity<LoanProps> {
   }
 
   public registerReturn(): void {
-    this.props.returnDate = new Date();
-    this.props.inventory.checkin();
-  }
+    const returnDate = new Date();
 
-  private initializeLoan(): void {
-    this.props.inventory.checkout();
-    this.props.dueDate = this.dueDateByMemberType();
+    if (isAfter(returnDate, this.dueDate)) {
+      this.props.status = LoanStatus.OVERDUE;
+    } else {
+      this.props.status = LoanStatus.CLOSED;
+    }
+
+    this.props.returnDate = returnDate;
+    this.props.inventory.checkin();
   }
 
   private dueDateByMemberType(): Date {
