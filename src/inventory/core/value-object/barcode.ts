@@ -7,7 +7,7 @@ interface BarcodeConstructorProps {
 
 export class Barcode {
   private readonly foundationYear = 2000;
-  private readonly start = 'SLB';
+  private readonly start = 'CLB';
   private _value: string;
 
   constructor({ acquisitionYear, sequence }: BarcodeConstructorProps) {
