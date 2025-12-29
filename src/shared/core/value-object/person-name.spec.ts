@@ -1,3 +1,4 @@
+import { MaxLengthError } from '../errors/max-length.error';
 import { PersonName } from './person-name';
 import { InvalidPersonNameError } from 'src/shared/core/errors/member/invalid-person-name.error';
 
@@ -16,5 +17,9 @@ describe('Person Name Value Object', () => {
   it('should format the name properly (trim and capitalize)', () => {
     const personName = new PersonName('  john   doe  ');
     expect(personName.value).toBe('John Doe');
+  });
+  it('should throw an error if name has more than 100 characters', () => {
+    const longName = 'a'.repeat(51) + ' ' + 'b'.repeat(51);
+    expect(() => new PersonName(longName)).toThrow(MaxLengthError);
   });
 });

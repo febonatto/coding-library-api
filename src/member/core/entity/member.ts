@@ -1,5 +1,5 @@
 import { Entity } from 'src/shared/core/abstract/entity';
-import { PersonName } from '../value-object/person-name';
+import { PersonName } from '../../../shared/core/value-object/person-name';
 import { Email } from '../value-object/email';
 import { MemberType } from '../types/member.type';
 import { MaxActiveLoansError } from 'src/shared/core/errors/member/max-active-loans.error';

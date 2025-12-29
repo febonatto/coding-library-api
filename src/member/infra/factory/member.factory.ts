@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { Member } from 'src/member/core/entity/member';
 import { MemberType } from 'src/member/core/types/member.type';
 import { Email } from 'src/member/core/value-object/email';
-import { PersonName } from 'src/member/core/value-object/person-name';
+import { PersonName } from 'src/shared/core/value-object/person-name';
 
 export class MemberFactory {
   static make(overrides?: Partial<Member>): Member {
